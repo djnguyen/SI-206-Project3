@@ -14,7 +14,8 @@ import twitter_info # same deal as always...
 import json
 import sqlite3
 
-## Your name:
+## Your name: David Nguyen (djnguyen)
+## Discussion: Thursday (3-4 PM)
 ## The names of anyone you worked with on this project:
 
 #####
@@ -59,14 +60,14 @@ CACHE_FNAME = "SI206_project3_cache.json"
 # The database file should have 2 tables, and each should have the following columns... 
 
 # table Tweets, with columns:
-# - tweet_id (containing the string id belonging to the Tweet itself, from the data you got from Twitter) -- this column should be the PRIMARY KEY of this table
+# - tweet_id (containing the string id belonging to the Tweet itself, from the data you got from Twitter -- note the id_str attribute) -- this column should be the PRIMARY KEY of this table
 # - text (containing the text of the Tweet)
-# - user_posted (an ID string, referencing the Users table, see below)
+# - user_id (an ID string, referencing the Users table, see below)
 # - time_posted (the time at which the tweet was created)
 # - retweets (containing the integer representing the number of times the tweet has been retweeted)
 
 # table Users, with columns:
-# - user_id (containing the string id belonging to the user, from twitter data) -- this column should be the PRIMARY KEY of this table
+# - user_id (containing the string id belonging to the user, from twitter data -- note the id_str attribute) -- this column should be the PRIMARY KEY of this table
 # - screen_name (containing the screen name of the user on Twitter)
 # - num_favs (containing the number of tweets that user has favorited)
 # - description (text containing the description of that user on Twitter, e.g. "Lecturer IV at UMSI focusing on programming" or "I tweet about a lot of things" or "Software engineer, librarian, lover of dogs..." -- whatever it is. OK if an empty string)
