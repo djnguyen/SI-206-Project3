@@ -17,7 +17,7 @@ import re
 
 ## Your name: David Nguyen (djnguyen)
 ## Discussion: Thursday (3-4 PM)
-## The names of anyone you worked with on this project: N/A
+## The names of anyone you worked with on this project: 
 
 #####
 
@@ -45,8 +45,9 @@ CACHE_FNAME = "SI206_project3_cache.json"
 try:
 	cache_file = open(CACHE_FNAME,'r')
 	cache_contents = cache_file.read()
-	cache_file.close()
 	CACHE_DICTION = json.loads(cache_contents)
+	cache_file.close()
+
 
 except:
 	CACHE_DICTION = {}
@@ -154,41 +155,6 @@ for single_tweet in all_tweets:
 db_conn.commit()
 
 # Working with Users Table
-
-# users_user_id = []
-# users_screen_name = []
-# users_num_favs = []
-# users_descripion = []
-
-# for user in umich_tweets:
-
-# 	for that_user in user['entities']['user_mentions']:
-
-# 		if that_user in CACHE_DICTION:
-# 			some_data = CACHE_DICTION[that_user]
-# 			users_user_id.append(some_data['id_str'])
-# 			users_screen_name.append(some_data['screen_name'])
-# 			users_num_favs.append(some_data['favourites_count'])
-# 			users_descripion.append(some_data['description'])
-
-# 		else:
-# 			mentioned_user_info = api.get_user(id = that_user['id_str']) # WATCH OUT FOR CACHING DATA UGH
-			
-# 			dumping_results = open(CACHE_FNAME,'w')
-# 			dumping_results.write(json.dumps(CACHE_DICTION, indent=2))
-# 			dumping_results.close()
-			
-# 			users_user_id.append(mentioned_user_info['id_str'])
-# 			users_screen_name.append(mentioned_user_info['screen_name'])
-# 			users_num_favs.append(mentioned_user_info['favourites_count'])
-# 			users_descripion.append(mentioned_user_info['description'])
-
-# all_users = list(zip(users_user_id, users_screen_name, users_num_favs, users_descripion))
-
-# add_user_statements = 'INSERT OR IGNORE INTO Users VALUES (?,?,?,?)'
-
-# for single_user in all_users:
-# 	cur.execute(add_user_statements, single_user)
 
 twitter_handle_list = []
 tweet_user_mentions = [user['entities']['user_mentions'] for user in umich_tweets]
@@ -311,7 +277,7 @@ for a_user in users_info:
 
 	twitter_info_diction[a_user[1]] = list_of_tweets
 
-print ("THIS DICTIONARY")
+print ("Printing Twitter Info Dictionary")
 print (twitter_info_diction)
 
 
@@ -325,8 +291,10 @@ print("\n\nBELOW THIS LINE IS OUTPUT FROM TESTS:\n")
 
 class Task1(unittest.TestCase):
 	def test_umich_caching(self):
-		fstr = open("SI206_project3_cache.json","r").read()
-		self.assertTrue("umich" in fstr)
+		fstr = open("SI206_project3_cache.json","r")
+		cached_file_contents = fstr.read()
+		fstr.close()
+		self.assertTrue("umich" in cached_file_contents)
 	def test_get_user_tweets(self):
 		res = get_user_tweets("umsi")
 		self.assertEqual(type(res),type(["hi",3]))
