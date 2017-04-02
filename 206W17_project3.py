@@ -253,8 +253,6 @@ for a_user in users_info:
 	twitter_info_diction[a_user[1]] = list_of_tweets
 
 
-
-
 ### IMPORTANT: MAKE SURE TO CLOSE YOUR DATABASE CONNECTION AT THE END OF THE FILE HERE SO YOU DO NOT LOCK YOUR DATABASE (it's fixable, but it's a pain). ###
 db_conn.commit()
 db_conn.close()
