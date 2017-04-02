@@ -108,21 +108,84 @@ umich_tweets = get_user_tweets("umich")
 ## HINT #2: You may want to go back to a structure we used in class this week to ensure that you reference the user correctly in each Tweet record.
 ## HINT #3: The users mentioned in each tweet are included in the tweet dictionary -- you don't need to do any manipulation of the Tweet text to find out which they are! Do some nested data investigation on a dictionary that represents 1 tweet to see it!
 
+db_conn = sqlite3.connect('project3_tweets.db')
+cur = db_conn.cursor()
 
+drop_table_statement_1 = 'DROP TABLE IF EXISTS Tweets'
+cur.execute(drop_table_statement_1)
 
+drop_table_statement_2 = 'DROP TABLE IF EXISTS Users'
+cur.execute(drop_table_statement_2)
 
+create_users_table = 'CREATE TABLE IF NOT EXISTS '
+create_users_table += 'Users (user_id TEXT PRIMARY KEY, screen_name TEXT, num_favs INTEGER, description TEXT)'
+cur.execute(create_users_table)
 
+create_tweets_table = 'CREATE TABLE IF NOT EXISTS '
+create_tweets_table += 'Tweets (tweet_id TEXT PRIMARY KEY, text TEXT, user_id TEXT NOT NULL, time_posted TIMESTAMP, retweets INTEGER, '
+create_tweets_table += 'FOREIGN KEY (user_id) REFERENCES Users(user_id) on UPDATE SET NULL)'
+cur.execute(create_tweets_table)
 
+db_conn.commit()
 
+# Working with Tweets Table
 
+tweets_tweet_id = []
+tweets_text = []
+tweets_user_id = []
+tweets_time_posted = []
+tweets_retweets = []
 
+for a_umich_tweet in umich_tweets:
+	tweets_tweet_id.append(a_umich_tweet['id_str'])
+	tweets_text.append(a_umich_tweet['text'])
+	tweets_user_id.append(a_umich_tweet['user']['id_str'])
+	tweets_time_posted.append(a_umich_tweet['created_at'])
+	tweets_retweets.append(a_umich_tweet['retweet_count'])
 
+all_tweets = list(zip(tweets_tweet_id, tweets_text, tweets_user_id, tweets_time_posted, tweets_retweets))
+
+add_tweets_statement = 'INSERT INTO Tweets VALUES (?,?,?,?,?)'
+
+for single_tweet in all_tweets:
+	cur.execute(add_tweets_statement, single_tweet)
+
+db_conn.commit()
+
+# Working with Users Table
+
+users_user_id = []
+users_screen_name = []
+users_num_favs = []
+users_descripion = []
+
+for user in umich_tweets:
+
+	for that_user in user['entities']['user_mentions']:
+		mentioned_user_info = api.get_user(id = that_user['id_str'])
+		users_user_id.append(mentioned_user_info['id_str'])
+		users_screen_name.append(mentioned_user_info['screen_name'])
+		users_num_favs.append(mentioned_user_info['favourites_count'])
+		users_descripion.append(mentioned_user_info['description'])
+
+all_users = list(zip(users_user_id, users_screen_name, users_num_favs, users_descripion))
+
+add_user_statements = 'INSERT OR IGNORE INTO Users VALUES (?,?,?,?)'
+
+for single_user in all_users:
+	cur.execute(add_user_statements, single_user)
+
+db_conn.commit()
 
 ## Task 3 - Making queries, saving data, fetching data
 
 # All of the following sub-tasks require writing SQL statements and executing them using Python.
 
 # Make a query to select all of the records in the Users database. Save the list of tuples in a variable called users_info.
+
+select_all_records_of_users_statement = 'SELECT * FROM Users'
+cur.execute(select_all_records_of_users_statement)
+users_info = cur.fetchall()
 
 # Make a query to select all of the user screen names from the database. Save a resulting list of strings (NOT tuples, the strings inside them!) in the variable screen_names. HINT: a list comprehension will make this easier to complete!
 
