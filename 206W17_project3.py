@@ -13,6 +13,7 @@ import tweepy
 import twitter_info # same deal as always...
 import json
 import sqlite3
+import re
 
 ## Your name: David Nguyen (djnguyen)
 ## Discussion: Thursday (3-4 PM)
@@ -154,26 +155,72 @@ db_conn.commit()
 
 # Working with Users Table
 
-users_user_id = []
-users_screen_name = []
-users_num_favs = []
-users_descripion = []
+# users_user_id = []
+# users_screen_name = []
+# users_num_favs = []
+# users_descripion = []
 
-for user in umich_tweets:
+# for user in umich_tweets:
 
-	for that_user in user['entities']['user_mentions']:
-		mentioned_user_info = api.get_user(id = that_user['id_str'])
-		users_user_id.append(mentioned_user_info['id_str'])
-		users_screen_name.append(mentioned_user_info['screen_name'])
-		users_num_favs.append(mentioned_user_info['favourites_count'])
-		users_descripion.append(mentioned_user_info['description'])
+# 	for that_user in user['entities']['user_mentions']:
 
-all_users = list(zip(users_user_id, users_screen_name, users_num_favs, users_descripion))
+# 		if that_user in CACHE_DICTION:
+# 			some_data = CACHE_DICTION[that_user]
+# 			users_user_id.append(some_data['id_str'])
+# 			users_screen_name.append(some_data['screen_name'])
+# 			users_num_favs.append(some_data['favourites_count'])
+# 			users_descripion.append(some_data['description'])
 
-add_user_statements = 'INSERT OR IGNORE INTO Users VALUES (?,?,?,?)'
+# 		else:
+# 			mentioned_user_info = api.get_user(id = that_user['id_str']) # WATCH OUT FOR CACHING DATA UGH
+			
+# 			dumping_results = open(CACHE_FNAME,'w')
+# 			dumping_results.write(json.dumps(CACHE_DICTION, indent=2))
+# 			dumping_results.close()
+			
+# 			users_user_id.append(mentioned_user_info['id_str'])
+# 			users_screen_name.append(mentioned_user_info['screen_name'])
+# 			users_num_favs.append(mentioned_user_info['favourites_count'])
+# 			users_descripion.append(mentioned_user_info['description'])
 
-for single_user in all_users:
-	cur.execute(add_user_statements, single_user)
+# all_users = list(zip(users_user_id, users_screen_name, users_num_favs, users_descripion))
+
+# add_user_statements = 'INSERT OR IGNORE INTO Users VALUES (?,?,?,?)'
+
+# for single_user in all_users:
+# 	cur.execute(add_user_statements, single_user)
+
+twitter_handle_list = []
+tweet_user_mentions = [user['entities']['user_mentions'] for user in umich_tweets]
+
+for that_user in tweet_user_mentions:
+	for x in that_user:
+		twitter_handle_list.append(x['screen_name'])
+
+
+some_insert_statement = 'INSERT OR IGNORE INTO Users VALUES (?,?,?,?)'
+
+for a_user in twitter_handle_list:
+	
+	try:
+
+		cached_data = CACHE_DICTION[a_user]
+		created_tuple = (cached_data['id'], a_user, cached_data['favourites_count'], cached_data['description'])
+		cur.execute(some_insert_statement, created_tuple)
+
+	except:
+		cached_data = api.get_user(screen_name = a_user)
+		CACHE_DICTION[a_user] = cached_data
+
+		dumping_results = open(CACHE_FNAME,'w')
+		dumping_results.write(json.dumps(CACHE_DICTION, indent=2))
+		dumping_results.close()
+		
+		created_tuple = (cached_data['id'], a_user, cached_data['favourites_count'], cached_data['description'])
+		cur.execute(some_insert_statement, created_tuple)		
+
+
+
 
 db_conn.commit()
 
@@ -196,7 +243,7 @@ screen_names = [thing[0] for thing in cur.fetchall()]
 # Make a query to select all of the tweets (full rows of tweet information) that have been retweeted more than 5 times. Save the result (a list of tuples, or an empty list) in a variable called more_than_25_rts.
 #UPDATE TO 5 
 
-select_tweets_RT_25_statement = 'SELECT * FROM Tweets WHERE retweets > 55' #WATCHH OUTTTT
+select_tweets_RT_25_statement = 'SELECT * FROM Tweets WHERE retweets > 5' 
 cur.execute(select_tweets_RT_25_statement)
 more_than_25_rts = cur.fetchall()
 
@@ -221,17 +268,29 @@ joined_result = cur.fetchall()
 
 ## Use a set comprehension to get a set of all words (combinations of characters separated by whitespace) among the descriptions in the descriptions_fav_users list. Save the resulting set in a variable called description_words.
 
-description_words = {x for description in descriptions_fav_users for x in description.split()}
-#print ("Description Words")
-#print (description_words)
+description_words = {word for some_string in descriptions_fav_users for word in some_string.split()}
+
+print ("Description Words")
+print (description_words)
+print ('-----------------------')
 
 
 ## Use a Counter in the collections library to find the most common character among all of the descriptions in the descriptions_fav_users list. Save that most common character in a variable called most_common_char. Break any tie alphabetically (but using a Counter will do a lot of work for you...).
 
-most_common_char = collections.Counter([a_char for description in descriptions_fav_users for x in description.split() for a_char in x]).most_common(1)[0][0]
+characters_list = []
 
-#print ("Most Common Character")
-#print (most_common_char)
+for description in descriptions_fav_users:
+	characters = re.findall(r"[a-zA-Z0-9]", description)
+	for character in characters:
+		characters_list.append(character)
+
+most_common_char = collections.Counter(characters_list).most_common(1)[0][0]
+
+
+
+print ("The Most Common Character is: ")
+print (most_common_char)
+print ('-----------------------')
 
 ## Putting it all together...
 # Write code to create a dictionary whose keys are Twitter screen names and whose associated values are lists of tweet texts that that user posted. You may need to make additional queries to your database! To do this, you can use, and must use at least one of: the DefaultDict container in the collections library, a dictionary comprehension, list comprehension(s). 
@@ -251,6 +310,9 @@ for a_user in users_info:
 		list_of_tweets = [thing[0] for thing in cur.fetchall()]
 
 	twitter_info_diction[a_user[1]] = list_of_tweets
+
+print ("THIS DICTIONARY")
+print (twitter_info_diction)
 
 
 ### IMPORTANT: MAKE SURE TO CLOSE YOUR DATABASE CONNECTION AT THE END OF THE FILE HERE SO YOU DO NOT LOCK YOUR DATABASE (it's fixable, but it's a pain). ###
