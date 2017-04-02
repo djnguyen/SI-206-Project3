@@ -16,7 +16,7 @@ import sqlite3
 
 ## Your name: David Nguyen (djnguyen)
 ## Discussion: Thursday (3-4 PM)
-## The names of anyone you worked with on this project:
+## The names of anyone you worked with on this project: N/A
 
 #####
 
@@ -41,6 +41,14 @@ api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
 CACHE_FNAME = "SI206_project3_cache.json"
 # Put the rest of your caching setup here:
 
+try:
+	cache_file = open(CACHE_FNAME,'r')
+	cache_contents = cache_file.read()
+	cache_file.close()
+	CACHE_DICTION = json.loads(cache_contents)
+
+except:
+	CACHE_DICTION = {}
 
 
 # Define your function get_user_tweets here:
@@ -250,3 +258,33 @@ class Task4(unittest.TestCase):
 
 if __name__ == "__main__":
 	unittest.main(verbosity=2)
+
+
+#MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+#MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+#MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+#MMMMMMM             MMMMMMMMMMMMMMMMM             MMMMMMMMM
+#MMMMMMM              MMMMMMMMMMMMMMM              MMMMMMMMM
+#MMMMMMM                MMMMMMMMMMM                MMMMMMMMM
+#MMMMMMM                 MMMMMMMMM                 MMMMMMMMM
+#MMMMMMM                  MMMMMMM                  MMMMMMMMM
+#MMMMMMMMMMM               MMMMM                MMMMMMMMMMMM
+#MMMMMMMMMMM                MMM                 MMMMMMMMMMMM
+#MMMMMMMMMMM                 V                  MMMMMMMMMMMM
+#MMMMMMMMMMM                                    MMMMMMMMMMMM
+#MMMMMMMMMMM         ^               ^          MMMMMMMMMMMM
+#MMMMMMMMMMM         MM             MM          MMMMMMMMMMMM
+#MMMMMMMMMMM         MMMM         MMMM          MMMMMMMMMMMM
+#MMMMMMMMMMM         MMMMM       MMMMM          MMMMMMMMMMMM
+#MMMMMMMMMMM         MMMMMM     MMMMMM          MMMMMMMMMMMM
+#MMMMMMM                MMMM   MMMM                MMMMMMMMM
+#MMMMMMM                MMMMMVMMMMM                MMMMMMMMM
+#MMMMMMM                MMMMMMMMMMM                MMMMMMMMM
+#MMMMMMM                MMMMMMMMMMM                MMMMMMMMM
+#MMMMMMM                MMMMMMMMMMM                MMMMMMMMM
+#MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+#MMMMMMMMMMMMMMMM/-------------------------/MMMMMMMMMMMMMMMM
+#MMMMMMMMMMMMMMM/- SCHOOL OF INFORMATION -/MMMMMMMMMMMMMMMMM
+#MMMMMMMMMMMMMM/-------------------------/MMMMMMMMMMMMMMMMMM
+#MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+#MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
