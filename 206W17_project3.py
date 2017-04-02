@@ -53,12 +53,28 @@ except:
 
 # Define your function get_user_tweets here:
 
+def get_user_tweets(twitter_handle):
 
+	if twitter_handle in CACHE_DICTION:
+		tweet_results = CACHE_DICTION[twitter_handle]
+		return tweet_results
+
+	else:
+		tweet_results = api.user_timeline(twitter_handle)
+		CACHE_DICTION[twitter_handle] = tweet_results
+
+		dumping_results = open(CACHE_FNAME,'w')
+		dumping_results.write(json.dumps(CACHE_DICTION, indent=2))
+		dumping_results.close()
+
+		return CACHE_DICTION[twitter_handle]
 
 
 # Write an invocation to the function for the "umich" user timeline and save the result in a variable called umich_tweets:
 
+umich_tweets = get_user_tweets("umich")
 
+#print (json.dumps(umich_tweets, indent=2))
 
 
 ## Task 2 - Creating database and loading data into database
@@ -88,7 +104,7 @@ except:
 # Info about all the tweets (at least 20) that you gather from the umich timeline.
 # NOTE: Be careful that you have the correct user ID reference in the user_id column! See below hints.
 
-## HINT: There's a Tweepy method to get user info that we've looked at before, so when you have a user id or screenname you can find alllll the info you want about the user.
+## HINT: There's a Tweepy method to get user info that we've looked at before, so when you have a user id or screenname you can find all the info you want about the user.
 ## HINT #2: You may want to go back to a structure we used in class this week to ensure that you reference the user correctly in each Tweet record.
 ## HINT #3: The users mentioned in each tweet are included in the tweet dictionary -- you don't need to do any manipulation of the Tweet text to find out which they are! Do some nested data investigation on a dictionary that represents 1 tweet to see it!
 
