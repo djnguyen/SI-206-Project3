@@ -40,7 +40,6 @@ api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
 ## Define a function called get_user_tweets that gets at least 20 Tweets from a specific Twitter user's timeline, and uses caching. The function should return a Python object representing the data that was retrieved from Twitter. (This may sound familiar...) We have provided a CACHE_FNAME variable for you for the cache file name, but you must write the rest of the code in this file.
 
 CACHE_FNAME = "SI206_project3_cache.json"
-# Put the rest of your caching setup here:
 
 try:
 	cache_file = open(CACHE_FNAME,'r')
@@ -130,7 +129,7 @@ cur.execute(create_tweets_table)
 
 db_conn.commit()
 
-# Working with Tweets Table
+# WORKING WITH TWEETS TABLE
 
 tweets_tweet_id = []
 tweets_text = []
@@ -154,14 +153,16 @@ for single_tweet in all_tweets:
 
 db_conn.commit()
 
-# Working with Users Table
+# WORKING WITH USERS TABLE
 
 twitter_handle_list = []
+
 tweet_user_mentions = [user['entities']['user_mentions'] for user in umich_tweets]
 
 for that_user in tweet_user_mentions:
 	for x in that_user:
-		twitter_handle_list.append(x['screen_name'])
+		if x['screen_name'] not in twitter_handle_list: #avoiding duplicates
+			twitter_handle_list.append(x['screen_name'])
 
 
 some_insert_statement = 'INSERT OR IGNORE INTO Users VALUES (?,?,?,?)'
@@ -185,9 +186,6 @@ for a_user in twitter_handle_list:
 		created_tuple = (cached_data['id'], a_user, cached_data['favourites_count'], cached_data['description'])
 		cur.execute(some_insert_statement, created_tuple)		
 
-
-
-
 db_conn.commit()
 
 ## Task 3 - Making queries, saving data, fetching data
@@ -207,7 +205,7 @@ cur.execute(select_all_users_statement)
 screen_names = [thing[0] for thing in cur.fetchall()]
 
 # Make a query to select all of the tweets (full rows of tweet information) that have been retweeted more than 5 times. Save the result (a list of tuples, or an empty list) in a variable called more_than_25_rts.
-#UPDATE TO 5 
+# UPDATED TO 5 PER PIAZZA POST
 
 select_tweets_RT_25_statement = 'SELECT * FROM Tweets WHERE retweets > 5' 
 cur.execute(select_tweets_RT_25_statement)
@@ -215,19 +213,19 @@ more_than_25_rts = cur.fetchall()
 
 
 # Make a query to select all the descriptions (descriptions only) of the users who have favorited more than 5 tweets. Access all those strings, and save them in a variable called descriptions_fav_users, which should ultimately be a list of strings.
-#UPDATE TO 5
+# UPDATED TO 5 PER PIAZZA POST
+
 select_users_fav_25_description_statement = 'SELECT description FROM Users WHERE num_favs > 5'
 cur.execute(select_users_fav_25_description_statement)
 descriptions_fav_users = [thing[0] for thing in cur.fetchall()]
 
 
 # Make a query using an INNER JOIN to get a list of tuples with 2 elements in each tuple: the user screen name and the text of the tweet -- for each tweet that has been retweeted more than 5 times. Save the resulting list of tuples in a variable called joined_result.
-# UPDATE TO 5
+# UPDATED TO 5 PER PIAZZA POST
 
 inner_join_statement = 'SELECT Users.screen_name, Tweets.text FROM Tweets INNER JOIN Users ON Tweets.user_id = Users.user_id WHERE Tweets.retweets > 5'
 cur.execute(inner_join_statement)
 joined_result = cur.fetchall()
-
 
 
 ## Task 4 - Manipulating data with comprehensions & libraries
@@ -236,23 +234,21 @@ joined_result = cur.fetchall()
 
 description_words = {word for some_string in descriptions_fav_users for word in some_string.split()}
 
-print ("Description Words")
+print ("Description Words is: ")
 print (description_words)
 print ('-----------------------')
 
 
 ## Use a Counter in the collections library to find the most common character among all of the descriptions in the descriptions_fav_users list. Save that most common character in a variable called most_common_char. Break any tie alphabetically (but using a Counter will do a lot of work for you...).
 
-characters_list = []
+characters_list = [] #all of the characters 
 
 for description in descriptions_fav_users:
-	characters = re.findall(r"[a-zA-Z0-9]", description)
+	characters = re.findall(r"[a-zA-Z0-9]", description) #using regX to search for the words
 	for character in characters:
 		characters_list.append(character)
 
-most_common_char = collections.Counter(characters_list).most_common(1)[0][0]
-
-
+most_common_char = collections.Counter(characters_list).most_common(1)[0][0] #using Counter in the Collections Library
 
 print ("The Most Common Character is: ")
 print (most_common_char)
@@ -283,6 +279,7 @@ print (twitter_info_diction)
 
 ### IMPORTANT: MAKE SURE TO CLOSE YOUR DATABASE CONNECTION AT THE END OF THE FILE HERE SO YOU DO NOT LOCK YOUR DATABASE (it's fixable, but it's a pain). ###
 db_conn.commit()
+
 db_conn.close()
 
 ###### TESTS APPEAR BELOW THIS LINE ######
@@ -292,7 +289,7 @@ print("\n\nBELOW THIS LINE IS OUTPUT FROM TESTS:\n")
 class Task1(unittest.TestCase):
 	def test_umich_caching(self):
 		fstr = open("SI206_project3_cache.json","r")
-		cached_file_contents = fstr.read()
+		cached_file_contents = fstr.read() #modified test case in order to resolve resource error
 		fstr.close()
 		self.assertTrue("umich" in cached_file_contents)
 	def test_get_user_tweets(self):
